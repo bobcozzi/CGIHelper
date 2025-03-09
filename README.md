@@ -1,12 +1,12 @@
 # CGIHelper Beta
-IBM i lightweight CGI Helper Library fof RPG CGI Programming
+IBM i lightweight CGI Helper Library for RPG CGI Programming
 This is an IBM i compatible *SAVF (Save File) that may be restored on IBM i V7R3 or later.
 The source code should compile on IBM i V7R2 but I haven't tested it in that environment yet.
 
 # Installation
 Upload the CGIHELPER save file to your IBM i server (normally to QGPL) and then issue a RSTLIB (restore lib) command.
 RSTLIB LIB(CGIHELPER) DEV(*SAVF) SAVF(QGPL/CGIHELPER) ALWOBJDIF(*ALL) MBROPT(*ALL)
-
+The save file is located in the "Release" page for this project (see link for Releases on the rightside of this page)
 This is an early BETA version although it is being used everyday in production-level workloads and has shown no signs of failure.
 I will be posted a serials of RPG CGI programs to help illustrate how to use this CGI library. Those example, which I am currently running include:
 DSPJOBLOG - Display a job's joblog via HTML
