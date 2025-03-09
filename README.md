@@ -2,6 +2,8 @@
 IBM i lightweight CGI Helper Library for RPG CGI Programming
 This is an IBM i compatible *SAVF (Save File) that may be restored on IBM i V7R3 or later.
 The source code should compile on IBM i V7R2 but I haven't tested it in that environment yet.
+Here is a link to the documentation index (small for now, but growning)
+https://bobcozzi.github.io/CGIHelper/index.html
 
 # Installation
 Download the CGIHelper save file from GitHub (use the "Release" link in the right side of the page or follow this link:
