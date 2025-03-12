@@ -119,6 +119,8 @@
 
    EXEC SQL SET OPTION  COMMIT=*NONE, NAMING=*SYS;
 
+   cgi_init();
+
    MSGQNAME   = cgi_getVar('MSGQ' : 1 : 'TOUPPER');
    MSGQOPTION = cgi_getVar('MSGQOPTION' : 1 : 'TOUPPER');
 
