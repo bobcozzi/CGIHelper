@@ -149,11 +149,13 @@
 
     EXEC SQL SET OPTION  COMMIT=*NONE, NAMING=*SYS;
 
-    counter = 0;
+      cgi_init();
 
-    jobID = cgi_getVar('JOB');
-    SPLNBR= cgi_getVar('SPLNBR');
-    SPLFNAME= cgi_getVar('SPLFNAME');
+      counter = 0;
+
+      jobID = cgi_getVar('JOB');
+      SPLNBR= cgi_getVar('SPLNBR');
+      SPLFNAME= cgi_getVar('SPLFNAME');
 
       // If using COZZI's SQL Tools READSPLF,
       // you can pass in the starting PAGE and Line
@@ -216,12 +218,13 @@
          // However, the IBM SYSTOOLS' SPOOLED_FILE_DATA
          // may be used instead, however the following
          // limitations apply to IBM's SPOOLED_FILE_DATA:
-         // - The SPOOLED_DATA column is VARCHAR(200)
+         // - The SPOOLED_DATA column is VARCHAR(200),
          // - Page and Line Number columns are not returned
          // - The SPLFNAME parameter is SPOOLED_FILE_NAME
          // - The SPLNBR parameter is SPOOLED_FILE_NUMBER
          // - All parameters are case-sensitive
-         // - SPOOLED_FILE_DATA uses DSPSPLF OUTFILE support
+         // - SPOOLED_FILE_DATA uses DSPSPLF OUTFILE support/
+         // - The SQL Tools READSPLF reads the actual SPOOLED file itself.
 
       EXEC SQL DECLARE SPLF CURSOR FOR
                   select PAGENBR, LINENBR, SPOOLED_DATA
@@ -287,6 +290,4 @@
    dcl-proc htmlPage_End;
       cgi_stdOut('</body>\n</html>\n');
    end-proc;
-
-
 
