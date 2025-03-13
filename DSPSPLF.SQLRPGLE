@@ -212,7 +212,7 @@
             'SPLNBR(' +  %TrimR(SPLNBR) + ') ' +
             'JOB(' + %trimR(JOBID) + ') </pre>\n');
 
-         // This is a "COZZI" SQL Tools Table Function
+         // This is a "COZZI SQL Tools" READSPLF Table Function
          // It performs faster and has fewer limits
          // than the SYSTOOLS version named SPOOLED_FILE_DATA.
          // However, the IBM SYSTOOLS' SPOOLED_FILE_DATA
