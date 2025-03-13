@@ -212,19 +212,23 @@
             'SPLNBR(' +  %TrimR(SPLNBR) + ') ' +
             'JOB(' + %trimR(JOBID) + ') </pre>\n');
 
-         // This is COZZI's "SQL Tools" READSPLF Table Function.
-         // It performs faster and has fewer limits
-         // than the SYSTOOLS version named SPOOLED_FILE_DATA.
+         // This is the Read SPooled File function.
+         // I am using COZZI's "SQL Tools" READSPLF Table Function.
+         // It performs faster and has fewer limitations
+         // than the SYSTOOLS example function named SPOOLED_FILE_DATA.
          // However, the IBM SYSTOOLS' SPOOLED_FILE_DATA
-         // may be used instead, however the following
-         // limitations apply to IBM's SPOOLED_FILE_DATA:
-         // - The SPOOLED_DATA column is VARCHAR(200),
-         // - Page and Line Number columns are not returned
-         // - The SPLFNAME parameter is SPOOLED_FILE_NAME
-         // - The SPLNBR parameter is SPOOLED_FILE_NUMBER
-         // - All parameters are case-sensitive
-         // - SPOOLED_FILE_DATA uses DSPSPLF OUTFILE support/
-         // - The SQL Tools READSPLF reads the actual SPOOLED file itself.
+         // may be used instead in place of READSPLF.
+         // The following differences apply when using SPOOLED_FILE_DATA:
+         // -- IBM's SYSTOOLS.SPOOLED_FILE_DATA;
+         //  -- SPOOLED_DATA is VARCHAR(200)
+         //  -- Uses the DSPSPLF CL command's OUTPUT FILE (OUTFILE) Support
+         //  -- All parameter values are case-sensitive
+         // -- Cozzi's SQLTOOLS.READSPLF:
+         //  -- SPOOLED_DATA is VARCHAR(2048)
+         //  -- Reads the actual SPOOLED file directly
+         //  -- Parameter values are case-insensitive
+         //  -- Page and Line Numbers are returned.
+         //  -- Supports optional starting page and line number input
 
       EXEC SQL DECLARE SPLF CURSOR FOR
                   select PAGENBR, LINENBR, SPOOLED_DATA
