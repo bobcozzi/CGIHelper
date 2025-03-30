@@ -1,0 +1,46 @@
+  STRPGMEXP  PGMLVL(*CURRENT) LVLCHK(*YES) SIGNATURE('RPG CGI HelperV1')
+
+    /* (c) 2025 by R. Cozzi, Jr.  */
+
+    /* cgi_stdout and cgi_htmlCmt write their content   */
+    /* directly to the stdout (i.e. the browser) device. */
+    /* html_xxxx functions return their value to the caller  */
+    /* rpg_xxxx functions are provided for pre-V7R4 compilers  */
+    /* to mimic newer RPG built-in functions.  */
+
+  EXPORT SYMBOL("cgi_stdout")
+  EXPORT SYMBOL("cgi_wrtHtmlCmt")
+  EXPORT SYMBOL("cgi_wrtContentType")
+
+  EXPORT SYMBOL("cgi_init")
+  EXPORT SYMBOL("cgi_clear")
+  EXPORT SYMBOL("cgi_getVarValue")
+  EXPORT SYMBOL("cgi_getVarCount")
+  EXPORT SYMBOL("cgi_getMODE")
+  EXPORT SYMBOL("cgi_getContentType")
+  EXPORT SYMBOL("cgi_getContentLength")
+  EXPORT SYMBOL("cgi_getRequestMethod")
+  EXPORT SYMBOL("cgi_getQueryString")
+  EXPORT SYMBOL("cgi_getCCSID")
+  EXPORT SYMBOL("cgi_decodeURI")
+  EXPORT SYMBOL("cgi_encodeURI")
+  EXPORT SYMBOL("cgi_encodeHTML")
+
+  EXPORT SYMBOL("cgi_getPGMNAME")
+  EXPORT SYMBOL("cgi_getPGMVIRTPATH")
+  EXPORT SYMBOL("cgi_getPGMPATH")
+  EXPORT SYMBOL("cgi_getPGMLIB")
+
+    /* html_xxxx functions return a varchar string with their data */
+  EXPORT SYMBOL("html_getStart")
+  EXPORT SYMBOL("html_getEnd")
+  EXPORT SYMBOL("html_getStyleLink")
+  EXPORT SYMBOL("html_tag")
+  EXPORT SYMBOL("html_cmt")
+
+
+  EXPORT SYMBOL("rpg_toLower")
+  EXPORT SYMBOL("rpg_toUpper")
+  EXPORT SYMBOL("rpg_Left")
+
+ENDPGMEXP

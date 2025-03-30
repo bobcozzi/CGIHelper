@@ -1,0 +1,159 @@
+ BLDSRVPGM:  PGM        PARM(&OBJLIB &SRCLIB &TGTRLS &DBGVIEW &CRTLIB)
+
+   /* This program builds (creates) the CGI HelpER Service Program      */
+   /* You should use the the associated Command to evoke this program:  */
+   /*   BLDCGIHELP OBJLIB(CGIHELPER) SRCLIB(CGIHELPER) DBGVIEW(*SOURCE) */
+   /* You must first compile "this" program once.                       */
+   /* To compile it use the CRTBNDCL command as follows:                */
+   /*    CRTBNDCL  PGM(CGIHELPER/BLDCGIHELP) SRCFILE(CGIHELPER/QCLSRC)  */
+   /*                SRCMBR(BLDCGIHELP)                                 */
+
+   /* Be sure to compile the Command Defition Object of the same.       */
+   /* See the source member CGIHELPER/QCMDSRC(BLDCGIHELP) for details.  */
+
+             DCL        VAR(&OBJLIB) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&SRCLIB) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&TGTRLS)  TYPE(*CHAR) LEN(8)
+             DCL        VAR(&DBGVIEW) TYPE(*CHAR) LEN(8)
+             DCL        VAR(&CRTLIB) TYPE(*LGL)
+             DCL        VAR(&RPGOPT) TYPE(*CHAR) LEN(6) VALUE(*BASIC)
+             DCL        VAR(&SQLOPT) TYPE(*CHAR) LEN(20) +
+                          VALUE('OPTIMIZE(*BASIC)')
+             DCL        VAR(&COPT) TYPE(*INT) LEN(4) VALUE(30)
+             DCLF       FILE(QAFDMBRL)
+             MONMSG     MSGID(CPF0000)
+
+             IF         COND(&CRTLIB = '1') THEN(DO)
+               CRTLIB     LIB(&OBJLIB) TYPE(*TEST) TEXT('CGI Helper +
+                            *SRVPGM product library by Bob COzzi')
+             ENDDO
+
+             IF (&DBGVIEW *NE '*NONE') THEN(DO)
+               CHGVAR     VAR(&RPGOPT) VALUE(*NONE)
+               CHGVAR     VAR(&COPT) VALUE(10)
+               CHGVAR     VAR(&SQLOPT) VALUE('OPTIMIZE(*NONE)')
+             ENDDO
+
+
+             SNDPGMMSG  MSGID(CPF9897) MSGF(QCPFMSG) +
+                          MSGDTA('Removing existing *MODULES in' +
+                          *BCAT &OBJLIB *BCAT '(if any)') +
+                          TOPGMQ(*EXT) MSGTYPE(*STATUS)
+
+          /* First get rid of any "old" *MODULE objects. */
+             DLTOBJ     OBJ(&OBJLIB/*ALL) OBJTYPE(*MODULE) +
+                          RMVMSG(*YES)
+
+          /* Now build a list of the source members to be compiled  */
+             DSPFD      FILE(&SRCLIB/QRPGLESRC) TYPE(*MBRLIST) +
+                          OUTPUT(*OUTFILE) FILEATR(*PF) +
+                          OUTFILE(QTEMP/CGIHLPLIST) OUTMBR(*FIRST +
+                          *REPLACE)
+             DSPFD      FILE(&SRCLIB/QCSRC) TYPE(*MBRLIST) +
+                          OUTPUT(*OUTFILE) FILEATR(*PF) +
+                          OUTFILE(QTEMP/CGIHLPLIST) OUTMBR(*FIRST +
+                          *ADD)
+             OVRDBF     FILE(QAFDMBRL) TOFILE(QTEMP/CGIHLPLIST) +
+                          LVLCHK(*NO)
+ READNEXT:   RCVF
+             MONMSG     MSGID(CPF0864) EXEC(GOTO CRTSRVPGM)
+             IF (%SST(&MLMTXT 1 4) = 'TEST'  *OR +
+                 %SST(&MLMTXT 1 3) = 'DEV'   *OR +
+                 %SST(&MLMTXT 1 5) = 'INDEV' *OR +
+                 &MLNAME = ' ')  THEN(GOTO READNEXT)
+
+             if (&MLFILE = 'QRPGLESRC') THEN(DO)
+                IF (%SST(&MLSEU2 1 3) = 'SQL') THEN(DO)
+                  CRTSQLRPGI OBJ(&OBJLIB/&MLNAME) SRCFILE(&MLLIB/&MLFILE) +
+                               SRCMBR(&MLNAME) COMMIT(*NONE) +
+                               OBJTYPE(*MODULE) OUTPUT(*PRINT) +
+                               RPGPPOPT(*LVL2) TGTRLS(&TGTRLS) +
+                               REPLACE(*YES) DBGVIEW(&DBGVIEW) +
+                               COMPILEOPT(&SQLOPT)
+                ENDDO
+                ELSE DO
+                  CRTRPGMOD  MODULE(&OBJLIB/&MLNAME) SRCFILE(&MLLIB/&MLFILE) +
+                               SRCMBR(&MLNAME) DBGVIEW(&DBGVIEW) +
+                               OPTIMIZE(&RPGOPT) REPLACE(*YES) +
+                               FIXNBR(*ZONED) TGTRLS(&TGTRLS) +
+                               ALWNULL(*USRCTL)
+                ENDDO
+             ENDDO
+             if (&MLFILE = 'QCSRC') THEN(DO)
+                IF (%SST(&MLSEU2 1 3) = 'CPP') THEN(DO)
+               CRTCPPMOD  MODULE(&OBJLIB/&MLNAME) SRCFILE(&MLLIB/&MLFILE) +
+                            SRCMBR(&MLNAME) OUTPUT(*PRINT) +
+                            OPTIMIZE(&COPT) DBGVIEW(&DBGVIEW) +
+                            SYSIFCOPT(*IFS64IO) REPLACE(*YES) +
+                            TGTRLS(&TGTRLS) +
+                            AUT(*USE) TERASPACE(*YES)
+                ENDDO
+                IF (%SST(&MLSEU2 1 3) = 'C  ') THEN(DO)
+                  CRTCMOD    MODULE(&OBJLIB/&MLNAME) SRCFILE(&MLLIB/&MLFILE) +
+                               SRCMBR(&MLNAME) OUTPUT(*PRINT) +
+                               OPTIMIZE(&COPT) DBGVIEW(&DBGVIEW) +
+                               SYSIFCOPT(*IFS64IO) REPLACE(*YES) +
+                               TGTRLS(&TGTRLS) +
+                               AUT(*USE) TERASPACE(*YES)
+                ENDDO
+             ENDDO
+             GOTO  READNEXT
+
+ CRTSRVPGM:
+           CRTSRVPGM  SRVPGM(&OBJLIB/CGIHELPER) MODULE(&OBJLIB/*ALL) +
+                          SRCFILE(&SRCLIB/QSRVSRC) SRCMBR(*SRVPGM) +
+                          TGTRLS(&TGTRLS) +
+                          TEXT('CGI Helper Service program by Bob +
+                          Cozzi') BNDSRVPGM((QHTTPSVR/QZHBCGI *IMMED))
+             /* Copy the main /COPY member to CGIHELPER/CGIHELPER,CGIHELPER */
+             CRTSRCPF   FILE(&OBJLIB/CGIHELPER) RCDLEN(112) +
+                          TEXT('CGI Helper /include (/copy) member')
+             MONMSG     MSGID(CPF0000)
+             CPYSRCF    FROMFILE(&SRCLIB/QCPYSRC) +
+                          TOFILE(&OBJLIB/CGIHELPER) +
+                          FROMMBR(CGIHELPER) TOMBR(*FROMMBR) +
+                          SRCTYPE(*FROMMBR)
+
+           IF (&OBJLIB *NE &SRCLIB) THEN(DO)
+             CRTDUPOBJ  OBJ(Q*) FROMLIB(&SRCLIB) OBJTYPE(*FILE) +
+                          TOLIB(&OBJLIB) DATA(*YES) CST(*NO) +
+                          TRG(*NO) FILEID(*NO) ACCCTL(*NONE)
+             MONMSG     MSGID(CPF0000)
+             CRTDUPOBJ  OBJ(H) FROMLIB(&SRCLIB) OBJTYPE(*FILE) +
+                          TOLIB(&OBJLIB) DATA(*YES) CST(*NO) +
+                          TRG(*NO) FILEID(*NO) ACCCTL(*NONE)
+             MONMSG     MSGID(CPF0000)
+      /* Copy source members to new library  */
+             CPYSRCF    FROMFILE(&SRCLIB/QCPYSRC) +
+                          TOFILE(&OBJLIB/QCPYSRC) FROMMBR(*ALL) +
+                          SRCTYPE(*FROMMBR) MBROPT(*REPLACE)
+             MONMSG     MSGID(CPF0000)
+             CPYSRCF    FROMFILE(&SRCLIB/QSRVSRC) +
+                          TOFILE(&OBJLIB/QSRVSRC) FROMMBR(*ALL) +
+                          SRCTYPE(*FROMMBR)  MBROPT(*REPLACE)
+             MONMSG     MSGID(CPF0000)
+             CPYSRCF    FROMFILE(&SRCLIB/H) +
+                          TOFILE(&OBJLIB/H) FROMMBR(*ALL) +
+                          SRCTYPE(*FROMMBR) MBROPT(*REPLACE)
+             MONMSG     MSGID(CPF0000)
+             CPYSRCF    FROMFILE(&SRCLIB/QCSRC) +
+                          TOFILE(&OBJLIB/QCSRC) FROMMBR(*ALL) +
+                          MBROPT(*REPLACE) TEXT(*FROMMBR) +
+                          SRCTYPE(*FROMMBR) SRCOPT(*SAME)
+             MONMSG     MSGID(CPF0000)
+             CPYSRCF    FROMFILE(&SRCLIB/QRPGLESRC) +
+                          TOFILE(&OBJLIB/QRPGLESRC) FROMMBR(*ALL) +
+                          SRCTYPE(*FROMMBR) MBROPT(*REPLACE)
+             MONMSG     MSGID(CPF0000)
+             CRTBNDDIR  BNDDIR(&OBJLIB/CGIHELPER) TEXT('CGI Helper +
+                          *SRVPGM Binding Directory')
+             MONMSG     MSGID(CPF0000)
+             ADDBNDDIRE BNDDIR(&OBJLIB/CGIHELPER) +
+                          OBJ((&OBJLIB/CGIHELPER *SRVPGM *DEFER))
+             MONMSG     MSGID(CPF0000)
+             ADDBNDDIRE BNDDIR(&OBJLIB/CGIHELPER) +
+                          OBJ((QHTTPSVR/QZHBCGI *SRVPGM *DEFER))
+             MONMSG     MSGID(CPF0000)
+           ENDDO
+             DLTOBJ     OBJ(&OBJLIB/*ALL) OBJTYPE(*MODULE)
+ ENDPGM:     ENDPGM
