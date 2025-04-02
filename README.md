@@ -7,7 +7,7 @@ https://bobcozzi.github.io/CGIHelper/index.html
 
 # Installation
 Download the CGIHelper save file from GitHub using the "Release" link in the right side of this page; or follow this link directly:
-[https://github.com/bobcozzi/CGIHelper/releases/download/v0.1/CGIHELPER.SAVF ](CGIHELPER *SRVPGM Download)
+https://github.com/bobcozzi/CGIHelper/releases/download/v0.1/CGIHELPER.SAVF 
 
 Upload the CGIHELPER save file to your IBM i server (normally to QGPL) and then issue a RSTLIB (restore lib) command.
 RSTLIB LIB(CGIHELPER) DEV(*SAVF) SAVF(QGPL/CGIHELPER) ALWOBJDIF(*ALL) MBROPT(*ALL)
